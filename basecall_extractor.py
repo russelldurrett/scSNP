@@ -29,7 +29,7 @@ samfile = pysam.AlignmentFile(bamfile_handle, "rb" )
 
 df = pd.DataFrame()
 
-for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1])):
+for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1]), int(query_position[1])):
 	try: 
 		pileupcolumn.get_query_sequences()
 	except AssertionError: 
@@ -61,5 +61,5 @@ for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1]
 			# print(len(df), 'base calls written thus far')
 
 # df.to_csv('mtDNA_basecalls.final.tsv', sep='\t', index=False)
-print df 
+print(df) 
 samfile.close()
