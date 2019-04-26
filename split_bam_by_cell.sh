@@ -7,7 +7,7 @@
 #cat cell_list.txt | while read CELL_BARCODE; do samtools view -F 1024 -h possorted_genome_bam.splitncigar.BQSR.bam |  awk -v tag="CB:Z:$CELL_BARCODE" '($0 ~ /^@/ || index($0,tag)>0)' > split_by_cell/${CELL_BARCODE}.sam ; done
 
 # MUCH faster: (awks the cell barcode identity per line and prints to respective file. loops thorugh bam only once)
-samtools view possorted_genome_bam.splitncigar.BQSR.bam | \                                                                      [21:34:18]
+samtools view possorted_genome_bam.splitncigar.BQSR.bam | \
 while read line; do
         cell=$(awk '{split($12,cbs,":"); print cbs[3]}' <<< $line);
   echo $line > split_by_cell/$cell
