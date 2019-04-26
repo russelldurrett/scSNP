@@ -31,7 +31,7 @@ df = pd.DataFrame()
 
 for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1])-1, int(query_position[1])+1):
 	try: 
-		pileupcolumn.get_query_sequences()
+		pileupcolumn.get_query_sequences() # gets wrong query sequences! off by one, must be zero-base error. ugh. 
 	except AssertionError: 
 		print('Skipping', pileupcolumn.reference_name, pileupcolumn.pos, 'because of pileupcolumn.get_query_sequences AssertionError problem')
 	else: 
@@ -39,9 +39,8 @@ for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1]
 			bd = od()
 			bd['chr']=pileupcolumn.reference_name
 			bd['pos']=pileupcolumn.pos 
-			query_sequences = [g.upper() for g in pileupcolumn.get_query_sequences()]
-			query_base_counts = [query_sequences.count(b) for b in set(bases+list(set(query_sequences)))]
-			print('Base', bd['chr'], bd['pos'], '\t', '\t'.join([str(b)+":"+str(c) for b,c in zip(bases,query_base_counts)]))
+			approximate_depth=pileupcolumn.n 
+			print('Base', bd['chr'], bd['pos'], '\t', 'Approximate Depth: ', str(approximate_depth)) 
 			for pileupread in pileupcolumn.pileups: 
 				if pileupread.query_position!=None:
 					rd = bd.copy()
@@ -55,10 +54,13 @@ for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1]
 						rd['umi'] = pileupalignmenttags['UB'] 
 					else:
 						rd['umi'] = pileupalignmenttags['UR']
-					rd['base_call'] = pileupalignment.query_sequence[pileupread.query_position]
+					rd['base_call'] = pileupalignment.query_sequence[pileupread.query_position-1]
 					df=df.append(rd, ignore_index=True)
 			# print(len(df), 'base calls written thus far')
 
 df.to_csv('basecalls_by_cell_umi.{}_{}.tsv'.format(query_position[0],query_position[1]), sep='\t', index=False)
-print(df.head(3)) 
+print(df.head(10))
+if len(df)>0: 
+	df.to_csv('basecalls_by_cell_umi.{}_{}.tsv'.format(query_position[0],query_position[1]), sep='\t', index=False)	
+	print(df.base_call.value_counts()) 
 samfile.close()
