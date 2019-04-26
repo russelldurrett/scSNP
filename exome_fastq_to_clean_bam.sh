@@ -15,7 +15,7 @@ GATK_JAR=/home/russd/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysis
 ## Let's Do This 
 
 echo 'Aligning Reads for '$SAMPLE
-bwa mem -M -R '@RG\tID:$SAMPLE\tLB:$SAMPLE\tSM:$SAMPLE' \
+bwa mem -M -R "@RG\tID:$SAMPLE\tLB:$SAMPLE\tSM:$SAMPLE" \
 -t $THREADS \
 $REF_BWA \
 $READ_DIR/$SAMPLE\_1.fastq.gz \
