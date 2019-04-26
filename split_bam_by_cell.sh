@@ -18,7 +18,7 @@
 samtools view possorted_genome_bam.splitncigar.BQSR.bam | \
 while read line; do
   cell=$(awk '{ for(i=1;i<=NF;++i){ if ($i ~ /CB:Z:/) {cell=split($i,cbs,":"); print cbs[3] } } }' <<< $line);
-  if [ -z "$var" ] 
+  if [ -z "$cell" ] 
   then 
   	echo "Cell is not set! Cell: ", $cell, " |  ", $line
   else 
