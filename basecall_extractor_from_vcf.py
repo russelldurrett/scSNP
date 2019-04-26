@@ -31,6 +31,7 @@ samfile = pysam.AlignmentFile(bamfile_handle, "rb" )
 vcffile = open(vcf_handle, 'rb') 
 
 for line in vcffile.readlines(): 
+	line=str(line.decode('utf-8')).rstrip()
 	if line[0]=='#': 
 		line_is_comment=True
 	else: 
@@ -69,6 +70,7 @@ for line in vcffile.readlines():
 							rd['base_call'] = pileupalignment.query_sequence[pileupread.query_position]
 							df=df.append(rd, ignore_index=True)
 					print(len(df), 'base calls written thus far')
+					df.to_csv('basecalls_by_cell_umi.working.tsv', sep='\t', index=False)
 
 df.to_csv('basecalls_by_cell_umi.final.tsv', sep='\t', index=False)
 samfile.close()
