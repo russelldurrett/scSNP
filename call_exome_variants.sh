@@ -15,7 +15,11 @@ GATK_JAR=/home/russd/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysis
 # Variant Calling = using bcftools call 
 
 # ensure only use non-duplicate reads, skip indel calling, call only targets suggested by 10x data 
-samtools view -bF 1024 $BAM_DIR/$SAMPLE\_recal_reads.bam | ~/software/bcftools-1.9/bcftools mpileup -Ou --max-depth 5000 -f $REF_FASTA - | ~/software/bcftools-1.9/bcftools call --threads $THREADS  --multiallelic-caller --skip-variants indels -T /stor/home/russd/scratch/10x_snps/FM1-4.bcfcalls.targets.txt > $SAMPLE\_bcfcalls.vcf 
+# samtools view -bF 1024 $BAM_DIR/$SAMPLE\_recal_reads.bam | ~/software/bcftools-1.9/bcftools mpileup -Ou --max-depth 5000 -f $REF_FASTA - | ~/software/bcftools-1.9/bcftools call --threads $THREADS  --multiallelic-caller --skip-variants indels -T /stor/home/russd/scratch/10x_snps/FM1-4.bcfcalls.targets.txt > $SAMPLE\_bcfcalls.vcf 
+
+# call all variants 
+samtools view -bF 1024 $BAM_DIR/$SAMPLE\_recal_reads.bam | ~/software/bcftools-1.9/bcftools mpileup -Ou --max-depth 5000 -f $REF_FASTA - | ~/software/bcftools-1.9/bcftools call --threads $THREADS  --multiallelic-caller --skip-variants indels --variants-only > $SAMPLE\_bcfcalls.vcf 
+
 
 # # use bcftools plugin to add AF and other tags to VCF (AF only works for multisample vcf...)
 # export BCFTOOLS_PLUGINS=/home/russd/software/bcftools-1.9/plugins/
