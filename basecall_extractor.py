@@ -59,6 +59,6 @@ for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1]
 					df=df.append(rd, ignore_index=True)
 			# print(len(df), 'base calls written thus far')
 
-# df.to_csv('mtDNA_basecalls.final.tsv', sep='\t', index=False)
-print(df) 
+df.to_csv('basecalls_by_cell_umi.{}_{}.tsv'.format(query_position[0],query_position[1]), sep='\t', index=False)
+print(df.head(3)) 
 samfile.close()
