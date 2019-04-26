@@ -20,7 +20,7 @@ while read line; do
   cell=$(awk '{ for(i=1;i<=NF;++i){ if ($i ~ /CB:Z:/) {cell=split($i,cbs,":"); print cbs[3] } } }' <<< $line);
   if [ -z "$cell" ] 
   then 
-  	echo "Cell is not set! Cell: ", $cell, " |  ", $line
+  	do_nothing='cell is empty for some reason'
   else 
   	echo $line >> split_by_cell/$cell
   fi 
