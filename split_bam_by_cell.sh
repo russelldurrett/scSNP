@@ -14,7 +14,17 @@
 #   echo $line > $cell
 # done
 
+
+
 # faster and actually works! 
+# over 600K cell barcodes found though, need to filter only those that pass cellranger filters 
+
+for filtered_cell in `cat cell_list.txt` 
+do 
+	touch split_by_cell/$filtered_cell 
+done 
+
+
 samtools view possorted_genome_bam.splitncigar.BQSR.bam | \
 while read line; do
   cell=$(awk '{ for(i=1;i<=NF;++i){ if ($i ~ /CB:Z:/) {cell=split($i,cbs,":"); print cbs[3] } } }' <<< $line);
@@ -22,9 +32,11 @@ while read line; do
   then 
   	do_nothing='cell is empty for some reason'
   else 
-  	echo $line >> split_by_cell/$cell
+  	if [ -f split_by_cell/$cell ]
+  	then 
+  		echo $line >> split_by_cell/$cell
+  	else 
+  		do_nothing='cell barcode was not in filtered list from cellranger'
+  	fi
   fi 
 done
-
-
-
