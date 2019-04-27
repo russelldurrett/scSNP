@@ -14,7 +14,7 @@ df = pd.DataFrame()
 samples = ['TP0','FM1','FM7','FMV1','FMV7']
 for sample in samples: 
 	os.chdir('/stor/home/russd/scratch/10x_snps/{}/basecalls'.format(sample))
-	basecall_files=os.listdir('/Users/red/Desktop/10x_snps/ex_basecalls')
+	basecall_files=os.listdir()
 	for basecall_file in basecall_files: 
 		if is_non_zero_file(basecall_file):
 			print('working on ', basecall_file)
