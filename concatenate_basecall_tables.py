@@ -22,7 +22,7 @@ for sample in samples:
 			dftmp['sample']=sample
 			# print(dftmp.head(2))
 			df=pd.concat([df,dftmp], axis=0, ignore_index=True)
-			df.to_csv("/stor/home/russd/scratch/10x_snps/concatenated_basecalls.working...tsv", sep='\t', index=False)
+			# df.to_csv("/stor/home/russd/scratch/10x_snps/concatenated_basecalls.working...tsv", sep='\t', index=False)
 		else: 
 			print('skipping empty file ', basecall_file)
 
