@@ -49,7 +49,6 @@ print(df_counts.head())
 
 
 
-
 cell_counts=df_counts.pivot_table(index=['chr:pos', 'cell', 'sample'], columns='base_call_gt', values='base_call', aggfunc='sum').drop('N',1).fillna(0).astype(int)
 sample_counts=df_counts.pivot_table(index=['chr:pos', 'sample'], columns='base_call_gt', values='base_call', aggfunc='sum').drop('N',1).fillna(0).astype(int)
 
@@ -98,8 +97,13 @@ posrefs.columns=['base_call_gt']
 posrefs[0]=0
 posrefs = posrefs.reset_index().set_index(['chr:pos','base_call_gt'])
 
+# only want definite mutants - require 2 variant reads for each cell/base 
 
-cell_mutants = cell_counts.copy().stack().reset_index().set_index(['chr:pos','base_call_gt'])
+cell_counts2 = cell_counts.stack()
+cell_counts2[cell_counts2<2] = 0
+cell_counts2 = cell_counts2.unstack()
+
+cell_mutants = cell_counts2.copy().stack().reset_index().set_index(['chr:pos','base_call_gt'])
 cell_mutants.update(posrefs)
 cell_mutants = cell_mutants.reset_index().set_index(['chr:pos','sample','cell','base_call_gt']).unstack().astype(int)
 
@@ -117,6 +121,16 @@ cell_mutants=cell_mutants.rename(columns={'tmp2':'cell'}).set_index(['chr:pos','
 cell_mutant_matrix = cell_mutants.sum(1).astype(bool).unstack().fillna(False).astype(int)   
 
 cell_mutant_matrix.to_csv('/stor/home/russd/scratch/10x_snps/cell_mutant.bool_matrix.tsv', sep='\t', index=True)
+
+
+
+lineages = pd.read_table('10x_FMV.lineage_assignment.clustered_lineage.singletons_only.tsv')
+lineage_mutants = pd.merge(cell_mutant_matrix.stack().to_frame().reset_index(), lineages.drop('sample',1), left_on='cell', right_on='proper_cell_name', how='left')
+lineage_mutants = lineage_mutants.drop('proper_cell_name',1)[['chr:pos','clustered_lineage',0]]
+
+lineage_mutants.columns = ['chr:pos','lineage',0]
+lineage_mutant_matrix = lineage_mutants.groupby(['chr:pos','lineage'])[0].sum().unstack().astype(bool).astype(int)
+lineage_mutant_matrix.to_csv('/stor/home/russd/scratch/10x_snps/lineage_mutant.bool_matrix.tsv', sep='\t', index=True)
 
 
 
