@@ -116,6 +116,7 @@ cell_mutants=cell_mutants.rename(columns={'tmp2':'cell'}).set_index(['chr:pos','
 
 cell_mutant_matrix = cell_mutants.sum(1).astype(bool).unstack().fillna(False).astype(int)   
 
+cell_mutant_matrix.to_csv('/stor/home/russd/scratch/10x_snps/cell_mutant.bool_matrix.tsv', sep='\t', index=True)
 
 
 
