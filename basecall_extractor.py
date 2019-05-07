@@ -56,12 +56,13 @@ for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1]
 						rd['umi'] = pileupalignmenttags['UR']
 					rd['base_call'] = pileupalignment.query_sequence[pileupread.query_position-1]
 					rd['base_call_quality'] = pileupalignment.query_qualities[pileupread.query_position-1]
-					rd = rd[['chr','pos','cell','umi','base_call','base_call_quality']]
 					df=df.append(rd, ignore_index=True)
 			# print(len(df), 'base calls written thus far')
 
-print(df.head(10))
+# print(df.head(10))
 if len(df)>0: 
+	df = df[['chr','pos','cell','umi','base_call','base_call_quality']]
+	print(df.head(5))
 	df.to_csv('basecalls_by_cell_umi.{}_{}.tsv'.format(query_position[0],query_position[1]), sep='\t', index=False)	
 	print(df.base_call.value_counts()) 
 samfile.close()
