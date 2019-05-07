@@ -5,7 +5,7 @@ import pandas as pd
 import sys 
 
 bamfile_handle = sys.argv[1]
-query_position = sys.argv[2].split(':')
+query_position = sys.argv[2].rstrip().split(':')
 
 print('Querying {}, position {}'.format(bamfile_handle, query_position))
 
