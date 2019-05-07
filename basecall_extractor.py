@@ -62,6 +62,7 @@ for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1]
 # print(df.head(10))
 if len(df)>0: 
 	df = df[['chr','pos','cell','umi','base_call','base_call_quality']]
+	df = df.astype({'chr':str,'pos':int,'base_call_quality':int})
 	print(df.head(5))
 	df.to_csv('basecalls_by_cell_umi.{}_{}.tsv'.format(query_position[0],query_position[1]), sep='\t', index=False)	
 	print(df.base_call.value_counts()) 
