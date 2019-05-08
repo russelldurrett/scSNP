@@ -30,11 +30,11 @@ samfile = pysam.AlignmentFile(bamfile_handle, "rb" )
 df = pd.DataFrame()
 
 for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1])-1, int(query_position[1])+1):
-	try: 
-		pileupcolumn.get_query_sequences() # gets wrong query sequences! off by one, must be zero-base error. ugh. 
-	except AssertionError: 
-		print('Skipping', pileupcolumn.reference_name, pileupcolumn.pos, 'because of pileupcolumn.get_query_sequences AssertionError problem')
-	else: 
+		# try: 
+		# 	pileupcolumn.get_query_sequences() # gets wrong query sequences! off by one, must be zero-base error. ugh. 
+		# except AssertionError: 
+		# 	print('Skipping', pileupcolumn.reference_name, pileupcolumn.pos, 'because of pileupcolumn.get_query_sequences AssertionError problem')
+		# else: 
 		if pileupcolumn.pos==int(query_position[1]):
 			bd = od()
 			bd['chr']=pileupcolumn.reference_name
@@ -63,7 +63,7 @@ for pileupcolumn in samfile.pileup(str(query_position[0]), int(query_position[1]
 if len(df)>0: 
 	df = df[['chr','pos','cell','umi','base_call','base_call_quality']]
 	df = df.astype({'chr':str,'pos':int,'base_call_quality':int})
-	df = df.sort_values(['cell','umi'])
+	df = df.sort_values(['cell','umi']).reset_index(drop=True)
 	print(df.head(5))
 	df.to_csv('basecalls_by_cell_umi.{}_{}.tsv'.format(query_position[0],query_position[1]), sep='\t', index=False)	
 	print(df.base_call.value_counts()) 
