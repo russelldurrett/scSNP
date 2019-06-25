@@ -41,18 +41,20 @@ echo 'realigning around indels - creating targets '
 java -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
   -T RealignerTargetCreator \
   -R $REF_FASTA \
+  -nct $THREADS \
   -known /stor/home/russd/work/references/GRCh38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
   -I possorted_genome_bam.splitncigar.bam \
   -o possorted_genome_bam.splitncigar.intervals
 
 echo 'realigning around indels - performing realignment'
 java -Xmx8G -Djava.io.tmpdir=/tmp -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
-    -T IndelRealigner \
-    -R $REF_FASTA \
-    -targetIntervals possorted_genome_bam.splitncigar.intervals \
-    -known /stor/home/russd/work/references/GRCh38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
-    -I possorted_genome_bam.splitncigar.bam \
-    -o possorted_genome_bam.splitncigar.indelrealigned.bam
+  -T IndelRealigner \
+  -R $REF_FASTA \
+  -nct $THREADS \
+  -targetIntervals possorted_genome_bam.splitncigar.intervals \
+  -known /stor/home/russd/work/references/GRCh38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
+  -I possorted_genome_bam.splitncigar.bam \
+  -o possorted_genome_bam.splitncigar.indelrealigned.bam
 
 
 
