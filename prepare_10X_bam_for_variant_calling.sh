@@ -14,45 +14,53 @@ REF_FASTA=~/work/references/refdata-cellranger-GRCh38-3.0.0/fasta/genome.fa
 # DUP MARKING OUTPUT COMPARISON 
 # marking duplicates with MarkDuplicates (not UMI/BC aware): 255963577 records, Marking 183084121 records as duplicates. 71.5% duplicate records 
 
-
 # sorted already 
 
 
 
-# # split N' trim 
-# echo 'splitting and trimming N cigar strings'
-# java -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
-#   -T SplitNCigarReads \
-#   -R $REF_FASTA  \
-#   -I possorted_genome_bam.bam \
-#   -o possorted_genome_bam.splitncigar.bam \
-#   -U ALLOW_N_CIGAR_READS \
-#   -rf ReassignOneMappingQuality \
-#   -RMQF 255 -RMQT 60
+# filter out reads from unfiltered low-quality cells 
+# requires filtered barcodes.tsv file from 10x output to make CB:Z:<cell_barcode> file at barcodes.cbz.tsv 
+echo 'filtering out reads from low-quality cells'
+cat barcodes.tsv | awk '{print "CB:Z:"$1"-1"}' > barcodes.cbz.tsv
+samtools view possorted_genome_bam.bam | grep -Ff barcodes.cbz.tsv > possorted_genome_bam.filtered_cells.sam 
+samtools view -H possorted_genome_bam.bam > possorted_genome_bam.header 
+samtools view -bS <(cat possorted_genome_bam.header possorted_genome_bam.filtered_cells.sam) > possorted_genome_bam.filtered_cells.bam 
+rm possorted_genome_bam.filtered_cells.sam possorted_genome_bam.header
 
 
 
+# split N' trim 
+echo 'splitting and trimming N cigar strings'
+java -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
+  -T SplitNCigarReads \
+  -R $REF_FASTA  \
+  -I possorted_genome_bam.filtered_cells.bam  \
+  -o possorted_genome_bam.filtered_cells.splitncigar.bam \
+  -U ALLOW_N_CIGAR_READS \
+  -rf ReassignOneMappingQuality \
+  -RMQF 255 -RMQT 60
 
-# INDEL REALIGNMENT (skippable, for now - focusing on SNPs)
+
+
 # indel realignment target creation 
-# indel realignment 
-
 echo 'realigning around indels - creating targets '
 java -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
   -T RealignerTargetCreator \
   -R $REF_FASTA \
   -known /stor/home/russd/work/references/GRCh38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
-  -I possorted_genome_bam.splitncigar.bam \
-  -o possorted_genome_bam.splitncigar.intervals
+  -I possorted_genome_bam.filtered_cells.splitncigar.bam \
+  -o possorted_genome_bam.filtered_cells.splitncigar.intervals
 
+# indel realignment 
 echo 'realigning around indels - performing realignment'
 java -Xmx8G -Djava.io.tmpdir=/tmp -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
   -T IndelRealigner \
   -R $REF_FASTA \
-  -targetIntervals possorted_genome_bam.splitncigar.intervals \
+  -targetIntervals possorted_genome_bam.filtered_cells.splitncigar.intervals \
+  --maxReadsForRealignment 50000 \
   -known /stor/home/russd/work/references/GRCh38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
-  -I possorted_genome_bam.splitncigar.bam \
-  -o possorted_genome_bam.splitncigar.indelrealigned.bam
+  -I possorted_genome_bam.filtered_cells.splitncigar.bam \
+  -o possorted_genome_bam.filtered_cells.splitncigar.indelrealigned.bam
 
 
 
@@ -64,7 +72,7 @@ java -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
   -nct $THREADS \
   -U ALLOW_N_CIGAR_READS \
   -R $REF_FASTA \
-  -I possorted_genome_bam.splitncigar.indelrealigned.bam \
+  -I possorted_genome_bam.filtered_cells.splitncigar.indelrealigned.bam \
   -o BQSR.recal.table \
   -knownSites /stor/home/russd/work/references/GRCh38/dbsnp_146.hg38.vcf.gz \
   -knownSites /stor/home/russd/work/references/GRCh38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
@@ -78,9 +86,9 @@ java -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
   -nct $THREADS \
   -U ALLOW_N_CIGAR_READS \
   -R $REF_FASTA \
-  -I possorted_genome_bam.splitncigar.indelrealigned.bam \
+  -I possorted_genome_bam.filtered_cells.splitncigar.indelrealigned.bam \
   -BQSR BQSR.recal.table \
-  -o possorted_genome_bam.splitncigar.indelrealigned.BQSR.bam
+  -o possorted_genome_bam.filtered_cells.splitncigar.indelrealigned.BQSR.bam
 
 
 
