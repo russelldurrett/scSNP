@@ -21,7 +21,7 @@ REF_FASTA=~/work/references/refdata-cellranger-GRCh38-3.0.0/fasta/genome.fa
 # filter out reads from unfiltered low-quality cells 
 # requires filtered barcodes.tsv file from 10x output to make CB:Z:<cell_barcode> file at barcodes.cbz.tsv 
 echo 'filtering out reads from low-quality cells'
-cat barcodes.tsv | awk '{print "CB:Z:"$1"-1"}' > barcodes.cbz.tsv
+cat barcodes.tsv | awk '{print "CB:Z:"$1}' > barcodes.cbz.tsv
 samtools view possorted_genome_bam.bam | grep -Ff barcodes.cbz.tsv > possorted_genome_bam.filtered_cells.sam 
 samtools view -H possorted_genome_bam.bam > possorted_genome_bam.header 
 samtools view -bS <(cat possorted_genome_bam.header possorted_genome_bam.filtered_cells.sam) > possorted_genome_bam.filtered_cells.bam 
