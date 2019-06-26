@@ -19,16 +19,16 @@ REF_FASTA=~/work/references/refdata-cellranger-GRCh38-3.0.0/fasta/genome.fa
 
 
 
-# split N' trim 
-echo 'splitting and trimming N cigar strings'
-java -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
-  -T SplitNCigarReads \
-  -R $REF_FASTA  \
-  -I possorted_genome_bam.bam \
-  -o possorted_genome_bam.splitncigar.bam \
-  -U ALLOW_N_CIGAR_READS \
-  -rf ReassignOneMappingQuality \
-  -RMQF 255 -RMQT 60
+# # split N' trim 
+# echo 'splitting and trimming N cigar strings'
+# java -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
+#   -T SplitNCigarReads \
+#   -R $REF_FASTA  \
+#   -I possorted_genome_bam.bam \
+#   -o possorted_genome_bam.splitncigar.bam \
+#   -U ALLOW_N_CIGAR_READS \
+#   -rf ReassignOneMappingQuality \
+#   -RMQF 255 -RMQT 60
 
 
 
@@ -41,7 +41,6 @@ echo 'realigning around indels - creating targets '
 java -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
   -T RealignerTargetCreator \
   -R $REF_FASTA \
-  -nct $THREADS \
   -known /stor/home/russd/work/references/GRCh38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
   -I possorted_genome_bam.splitncigar.bam \
   -o possorted_genome_bam.splitncigar.intervals
@@ -50,7 +49,6 @@ echo 'realigning around indels - performing realignment'
 java -Xmx8G -Djava.io.tmpdir=/tmp -jar ~/software/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar \
   -T IndelRealigner \
   -R $REF_FASTA \
-  -nct $THREADS \
   -targetIntervals possorted_genome_bam.splitncigar.intervals \
   -known /stor/home/russd/work/references/GRCh38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
   -I possorted_genome_bam.splitncigar.bam \
