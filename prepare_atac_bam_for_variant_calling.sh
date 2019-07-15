@@ -11,8 +11,19 @@ THREADS=6
 REF_FASTA=~/work/references/refdata-cellranger-GRCh38-3.0.0/fasta/genome.fa
 
 
+
+java -jar ~/software/picard.jar AddOrReplaceReadGroups \
+  I=$INPUT_BAM \
+  O=$INPUT_PREFIX.rg.bam \
+  RGID=1 \
+  RGLB=lib1 \
+  RGPL=illumina \
+  RGPU=unit1 \
+  RGSM=$INPUT_PREFIX
+ 
+
 # MARK DUPLICATES
-java -jar ~/software/picard.jar MarkDuplicates INPUT=$INPUT_BAM OUTPUT=$INPUT_PREFIX.dups.bam M=dup.metrics   # CREATE_INDEX=true VALIDATION_STRINGENCY=SILENT M=output.metrics 
+java -jar ~/software/picard.jar MarkDuplicates INPUT=$INPUT_PREFIX.rg.bam OUTPUT=$INPUT_PREFIX.dups.bam M=dup.metrics   # CREATE_INDEX=true VALIDATION_STRINGENCY=SILENT M=output.metrics 
 # # mark duplicates using UMI info: 
 # #java -jar ~/software/picard.jar UmiAwareMarkDuplicatesWithMateCigar INPUT=possorted_genome_bam.bam OUTPUT=possorted_genome_bam.dupsumi.bam M=dupumi.metrics  UMI_METRICS_FILE=dupumi.umi.metrics BARCODE_TAG=BC UMI_TAG_NAME=UR
 
