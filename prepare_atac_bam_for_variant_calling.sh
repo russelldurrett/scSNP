@@ -1,9 +1,9 @@
 # 10X output to GATK-ready 
 
 INPUT_BAM=$1 
-INPUT_PREFIX=${INPUT_BAM/.bam/}
-
 echo 'preparing bam file:' $INPUT_BAM
+
+INPUT_PREFIX=${INPUT_BAM/.bam/}
 echo 'input prefix / sample name: ' $INPUT_PREFIX
 
 
