@@ -8,7 +8,7 @@ echo 'input prefix / sample name: ' $INPUT_PREFIX
 
 
 THREADS=6
-REF_FASTA=~/work/references/refdata-cellranger-GRCh38-3.0.0/fasta/genome.fa
+REF_FASTA=/stor/home/russd/work/references/GRCh38/Homo_sapiens_assembly38.fasta
 
 
 
